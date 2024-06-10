@@ -1,0 +1,126 @@
+import heapq
+
+class PuzzleState:
+    def __init__(self, board, goal, moves=0, previous=None):
+        self.board = board
+        self.goal = goal
+        self.moves = moves
+        self.previous = previous
+
+    def __lt__(self, other):
+        return self.cost() < other.cost()
+
+    def __eq__(self, other):
+        return self.board == other.board
+
+    def __hash__(self):
+        return hash(tuple(map(tuple, self.board)))
+
+    def cost(self):
+        return self.moves + self.heuristic()
+
+    def heuristic(self):
+        # Using Manhattan distance as heuristic
+        distance = 0
+        for i in range(len(self.board)):
+            for j in range(len(self.board[i])):
+                if self.board[i][j] != 0:
+                    goal_x, goal_y = divmod(self.goal.index(self.board[i][j]), 3)
+                    distance += abs(goal_x - i) + abs(goal_y - j)
+        return distance
+
+    def find_blank(self):
+        for i in range(len(self.board)):
+            for j in range(len(self.board[i])):
+                if self.board[i][j] == 0:
+                    return i, j
+
+    def neighbors(self):
+        def swap_and_create(new_i, new_j):
+            new_board = [row[:] for row in self.board]
+            new_board[blank_i][blank_j], new_board[new_i][new_j] = new_board[new_i][new_j], new_board[blank_i][blank_j]
+            return PuzzleState(new_board, self.goal, self.moves + 1, self)
+
+        blank_i, blank_j = self.find_blank()
+        neighbors = []
+        if blank_i > 0:  # Up
+            neighbors.append(swap_and_create(blank_i - 1, blank_j))
+        if blank_i < 2:  # Down
+            neighbors.append(swap_and_create(blank_i + 1, blank_j))
+        if blank_j > 0:  # Left
+            neighbors.append(swap_and_create(blank_i, blank_j - 1))
+        if blank_j < 2:  # Right
+            neighbors.append(swap_and_create(blank_i, blank_j + 1))
+        return neighbors
+
+def print_solution(solution):
+    path = []
+    while solution:
+        path.append(solution.board)
+        solution = solution.previous
+    path.reverse()
+    for step in path:
+        for row in step:
+            print(" ".join(map(str, row)))
+        print()
+
+def solve_puzzle(start, goal):
+    start_state = PuzzleState(start, sum(goal, []))
+    goal_state = PuzzleState(goal, sum(goal, []))
+
+    open_set = []
+    heapq.heappush(open_set, start_state)
+    closed_set = set()
+
+    while open_set:
+        current_state = heapq.heappop(open_set)
+
+        if current_state == goal_state:
+            print_solution(current_state)
+            return
+
+        closed_set.add(current_state)
+
+        for neighbor in current_state.neighbors():
+            if neighbor in closed_set:
+                continue
+
+            if neighbor not in open_set:
+                heapq.heappush(open_set, neighbor)
+            else:
+                # Update the cost if this path is cheaper
+                existing = open_set[open_set.index(neighbor)]
+                if neighbor.cost() < existing.cost():
+                    open_set[open_set.index(neighbor)] = neighbor
+                    heapq.heapify(open_set)
+
+if __name__ == "__main__":
+    start = [
+        [1, 2, 3],
+        [4, 0, 6],
+        [7, 5, 8]
+    ]
+    goal = [
+        [1, 2, 3],
+        [4, 5, 6],
+        [7, 8, 0]
+    ]
+    solve_puzzle(start, goal)
+
+
+
+//OUTPUT
+
+1 2 3
+4 0 6
+7 5 8
+
+1 2 3
+4 5 6
+7 0 8
+
+1 2 3
+4 5 6
+7 8 0
+
+
