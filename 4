@@ -1,0 +1,42 @@
+from itertools import permutations
+
+def is_valid_solution(perm):
+    mapping = {letter: digit for letter, digit in zip('SENDMORY', perm)}
+    send = mapping['S'] * 1000 + mapping['E'] * 100 + mapping['N'] * 10 + mapping['D']
+    more = mapping['M'] * 1000 + mapping['O'] * 100 + mapping['R'] * 10 + mapping['E']
+    money = mapping['M'] * 10000 + mapping['O'] * 1000 + mapping['N'] * 100 + mapping['E'] * 10 + mapping['Y']
+    
+    return send + more == money
+
+def solve_cryptarithmetic():
+    letters = 'SENDMORY'
+    for perm in permutations(range(10), len(letters)):
+        if perm[letters.index('S')] == 0 or perm[letters.index('M')] == 0: 
+            continue
+        if is_valid_solution(perm):
+            return {letter: digit for letter, digit in zip(letters, perm)}
+    
+    return None
+
+solution = solve_cryptarithmetic()
+if solution:
+    print("Solution found:")
+    for letter, digit in solution.items():
+        print(f"{letter}: {digit}")
+else:
+    print("No solution exists")
+
+
+
+
+///OUTPUT
+
+Solution found:
+S: 9
+E: 5
+N: 6
+D: 7
+M: 1
+O: 0
+R: 8
+Y: 2
