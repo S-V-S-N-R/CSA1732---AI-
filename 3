@@ -1,0 +1,52 @@
+from collections import deque
+
+def bfs_solve_water_jug(jug1_capacity, jug2_capacity, target):
+    # Initialize the queue for BFS
+    queue = deque()
+    queue.append((0, 0))  # Starting with both jugs empty
+
+    # Set to keep track of visited states
+    visited = set()
+    visited.add((0, 0))
+
+    while queue:
+        jug1, jug2 = queue.popleft()
+
+        # If we find the solution
+        if jug1 == target or jug2 == target or jug1 + jug2 == target:
+            return True
+
+        # List all possible actions
+        actions = [
+            (jug1_capacity, jug2),  # Fill jug1
+            (jug1, jug2_capacity),  # Fill jug2
+            (0, jug2),              # Empty jug1
+            (jug1, 0),              # Empty jug2
+            (min(jug1 + jug2, jug1_capacity), jug2 - (min(jug1_capacity - jug1, jug2))),  # Pour jug2 to jug1
+            (jug1 - (min(jug2_capacity - jug2, jug1)), min(jug1 + jug2, jug2_capacity))   # Pour jug1 to jug2
+        ]
+
+        for state in actions:
+            if state not in visited:
+                visited.add(state)
+                queue.append(state)
+
+    return False
+
+def main():
+    jug1_capacity = 4
+    jug2_capacity = 3
+    target = 2
+
+    if bfs_solve_water_jug(jug1_capacity, jug2_capacity, target):
+        print(f"It is possible to measure exactly {target} liters.")
+    else:
+        print(f"It is not possible to measure exactly {target} liters.")
+
+if __name__ == "__main__":
+    main()
+
+
+
+///OUTPUT
+It is possible to measure exactly 2 liters.
