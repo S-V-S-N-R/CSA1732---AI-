@@ -1,0 +1,38 @@
+class VacuumCleaner:
+    def __init__(self, location='A'):
+        self.location = location  
+        self.clean_count = 0      
+
+    def move(self, location):
+        self.location = location
+
+    def clean(self):
+        print("Cleaning the current location...")
+        self.clean_count += 1
+
+if __name__ == "__main__":
+    vacuum = VacuumCleaner()
+
+    locations = ['A', 'B']
+
+    for location in locations:
+        print("Current location:", location)
+        if location == vacuum.location:
+            vacuum.clean()
+        else:
+            print("Moving to", location)
+            vacuum.move(location)
+            vacuum.clean()
+
+    print("Cleaning completed!")
+    print("Total number of cleanings:", vacuum.clean_count)
+
+
+//OUTPUT
+Current location: A
+Cleaning the current location...
+Current location: B
+Moving to B
+Cleaning the current location...
+Cleaning completed!
+Total number of cleanings: 2
