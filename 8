@@ -1,0 +1,37 @@
+def dfs_iterative(graph, start):
+    visited = set()
+    
+    stack = [start]
+    
+    dfs_order = []
+    
+    while stack:
+        node = stack.pop()
+        
+        if node not in visited:
+            visited.add(node)
+            
+            dfs_order.append(node)
+            
+            for neighbor in reversed(graph[node]):
+                if neighbor not in visited:
+                    stack.append(neighbor)
+    
+    return dfs_order
+
+graph = {
+    'A': ['B', 'C'],
+    'B': ['A', 'D', 'E'],
+    'C': ['A', 'F'],
+    'D': ['B'],
+    'E': ['B', 'F'],
+    'F': ['C', 'E']
+}
+
+start_node = 'A'
+dfs_result = dfs_iterative(graph, start_node)
+print(f"DFS traversal starting from node {start_node}: {dfs_result}")
+
+
+//OUTPUT
+DFS traversal starting from node A: ['A', 'B', 'D', 'E', 'F', 'C']
