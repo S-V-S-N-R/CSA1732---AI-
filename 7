@@ -1,0 +1,34 @@
+from collections import deque
+
+def bfs(graph, start):
+ 
+    visited = set()
+    queue = deque([start])
+    bfs_order = []
+    while queue:
+        node = queue.popleft() 
+        if node not in visited:
+            visited.add(node)
+            bfs_order.append(node)
+            
+            for neighbor in graph[node]:
+                if neighbor not in visited:
+                    queue.append(neighbor)
+    
+    return bfs_order
+
+graph = {
+    'A': ['B', 'C'],
+    'B': ['A', 'D', 'E'],
+    'C': ['A', 'F'],
+    'D': ['B'],
+    'E': ['B', 'F'],
+    'F': ['C', 'E']
+}
+
+start_node = 'A'
+bfs_result = bfs(graph, start_node)
+print(f"BFS traversal starting from node {start_node}: {bfs_result}")
+
+//OUTPUT
+BFS traversal starting from node A: ['A', 'B', 'C', 'D', 'E', 'F']
