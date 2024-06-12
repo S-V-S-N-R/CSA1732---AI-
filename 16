@@ -1,0 +1,66 @@
+import numpy as np
+
+def sigmoid(x):
+    return 1 / (1 + np.exp(-x))
+
+def sigmoid_derivative(x):
+    return x * (1 - x)
+
+def relu(x):
+    return np.maximum(0, x)
+
+def relu_derivative(x):
+    return np.where(x > 0, 1, 0)
+
+def mean_squared_error(y_true, y_pred):
+    return np.mean((y_true - y_pred) ** 2)
+
+class FeedForwardNeuralNetwork:
+    def __init__(self, input_size, hidden_size, output_size):
+        self.weights1 = np.random.randn(input_size, hidden_size)
+        self.biases1 = np.random.randn(hidden_size)
+        self.weights2 = np.random.randn(hidden_size, output_size)
+        self.biases2 = np.random.randn(output_size)
+
+    def forward(self, X):
+        self.hidden_input = np.dot(X, self.weights1) + self.biases1
+        self.hidden_output = relu(self.hidden_input)
+        self.output_input = np.dot(self.hidden_output, self.weights2) + self.biases2
+        self.output = sigmoid(self.output_input)
+        return self.output
+
+    def backward(self, X, y, output, learning_rate):
+        # Backward pass
+        output_error = y - output
+        output_delta = output_error * sigmoid_derivative(output)
+
+        hidden_error = np.dot(output_delta, self.weights2.T)
+        hidden_delta = hidden_error * relu_derivative(self.hidden_output)
+
+        # Update weights and biases
+        self.weights2 += np.dot(self.hidden_output.T, output_delta) * learning_rate
+        self.biases2 += np.sum(output_delta, axis=0) * learning_rate
+        self.weights1 += np.dot(X.T, hidden_delta) * learning_rate
+        self.biases1 += np.sum(hidden_delta, axis=0) * learning_rate
+
+    def train(self, X, y, epochs, learning_rate):
+        for epoch in range(epochs):
+            output = self.forward(X)
+            self.backward(X, y, output, learning_rate)
+            loss = mean_squared_error(y, output)
+            if epoch % 100 == 0:
+                print(f"Epoch {epoch}, Loss: {loss}")
+
+# Example usage
+if __name__ == "__main__":
+    # Create a simple dataset
+    X = np.array([[0, 0], [0, 1], [1, 0], [1, 1]])
+    y = np.array([[0], [1], [1], [0]])  # XOR problem
+
+    nn = FeedForwardNeuralNetwork(input_size=2, hidden_size=4, output_size=1)
+
+    nn.train(X, y, epochs=10000, learning_rate=0.1)
+
+    output = nn.forward(X)
+    print("Predictions:")
+    print(output)
